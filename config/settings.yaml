@@ -1,0 +1,83 @@
+# ============================================================
+#  الإعدادات الأساسية — عدّلها هنا أو من Telegram عبر الأوامر
+#  (الأوامر تُخزَّن كتجاوزات (overrides) فوق هذا الملف، و /reset تلغيها)
+# ============================================================
+
+channel:
+  id: "@your_channel"          # معرّف القناة (أو رقمها مثل -100123456789)
+  paused: false                # إيقاف النشر مؤقتاً
+  link_preview: false          # معاينة الروابط داخل الرسائل
+
+schedule:
+  timezone: Africa/Algiers
+  batch_times: ["08:00", "10:30", "13:00", "15:30", "18:00", "20:30"]   # الدفعات العادية
+  digest_time: "23:00"         # الدفعة الأخيرة: موجز عناوين اليوم  (المجموع = 6 + 1 = 7 دفعات)
+  day_start: "08:00"           # يُستعمل عند الأمر /batches لتوزيع المواعيد بالتساوي
+  day_end: "21:00"
+  items_per_batch: 3           # عدد الأخبار في كل دفعة عادية
+  grace_minutes: 90            # إن تأخر التشغيل، تُنفَّذ الدفعة خلال هذه المهلة
+  collect_every_minutes: 30    # وتيرة جمع الأخبار
+
+quotas:
+  mode: ratio                  # ratio = حصص بالنسبة | weight = ترتيب بالصدى فقط
+  scope: daily                 # daily = النسبة على مستوى اليوم | batch = في كل دفعة
+  ratios:                      # نسب النشر بين المجالات (تُطبَّع تلقائياً إلى 100)
+    politics: 50
+    economy: 30
+    technology: 20
+  allow_other: false           # false = المجالات الثلاثة فقط، وأي مجال آخر يُتجاهل
+
+selection:
+  max_age_hours: 18            # لا تُنشر قصة أقدم من هذا
+  min_score: 4.0               # الحد الأدنى للصدى (0-10) حتى لا تُملأ الحصة بأخبار ضعيفة
+  llm_top_k: 30                # عدد القصص التي يصنّفها النموذج في كل دورة
+  require_min_sources: 2       # لا يُنشر الخبر العادي إلا بتأكيد مصدرين مستقلين
+  allow_single_trusted: true   # يُسمح بمصدر واحد إن كان موثوقاً وأهميته عالية
+  single_trusted_importance: 8.5
+
+scoring:
+  weights:
+    source_count: 0.45         # عدد المصادر المستقلة التي غطّت القصة
+    source_quality: 0.20       # جودة المصادر (weight في sources.yaml)
+    velocity: 0.20             # سرعة الانتشار (مصادر جديدة خلال الساعات الأخيرة)
+    llm_importance: 0.15       # تقدير النموذج لأهمية الحدث
+  saturate_sources: 6          # عدد المصادر الذي يُعطي الدرجة الكاملة
+  velocity_hours: 3
+  saturate_velocity: 5
+
+breaking:                      # الأخبار العاجلة: تُنشر فوراً خارج الجدول
+  enabled: true
+  importance_threshold: 9
+  min_sources: 5
+  min_recent_sources: 4
+  recent_hours: 2
+  max_per_day: 5
+
+dedupe:
+  similarity_gemini: 0.80      # عتبة التشابه لدمج الأخبار في قصة واحدة (عدّلها عند الحاجة)
+  similarity_hash: 0.55        # عتبة بديلة عند تعذّر خدمة embeddings
+  published_similarity_gemini: 0.82
+  published_similarity_hash: 0.60
+  published_memory_hours: 72   # مدة تذكّر القصص المنشورة لمنع تكرارها
+
+embeddings:
+  provider: gemini
+  model: gemini-embedding-001
+  dim: 256
+
+llm:
+  temperature: 0.3
+  providers:                   # يُجرَّب بالترتيب، وينتقل للتالي عند الفشل أو نفاد الحصة
+    - { name: gemini, model: gemini-2.5-flash, key_env: GEMINI_API_KEY }
+    - { name: groq, model: llama-3.3-70b-versatile, key_env: GROQ_API_KEY }
+
+style:
+  max_chars: 600               # أقصى طول لنص الخبر (حد تيليغرام 4096)
+  headline_max_chars: 90
+  include_source: true
+  hashtags: true
+  post_delay_seconds: 2
+  max_retries: 2               # عدد إعادات الصياغة عند فشل الفحص
+
+safety:
+  blocked_keywords: []         # أي خبر يحتوي إحدى هذه الكلمات يُرفض

@@ -1,0 +1,29 @@
+# قائمة المصادر. weight من 0 إلى 1 (الجودة)، trusted = وكالة/مصدر موثوق.
+# تحقّق من الروابط دورياً: المشروع يسجّل أي مصدر يفشل ويكمل بالباقي.
+sources:
+  - { id: bbc_world, name: BBC News, name_ar: بي بي سي, url: "http://feeds.bbci.co.uk/news/world/rss.xml", lang: en, weight: 0.9, trusted: true }
+  - { id: bbc_business, name: BBC Business, name_ar: بي بي سي, url: "http://feeds.bbci.co.uk/news/business/rss.xml", lang: en, weight: 0.9, trusted: true }
+  - { id: bbc_tech, name: BBC Technology, name_ar: بي بي سي, url: "http://feeds.bbci.co.uk/news/technology/rss.xml", lang: en, weight: 0.9, trusted: true }
+  - { id: bbc_ar, name: BBC Arabic, name_ar: بي بي سي عربي, url: "https://feeds.bbci.co.uk/arabic/rss.xml", lang: ar, weight: 0.85, trusted: true }
+  - { id: aljazeera_en, name: Al Jazeera, name_ar: الجزيرة, url: "https://www.aljazeera.com/xml/rss/all.xml", lang: en, weight: 0.85, trusted: true }
+  - { id: dw_en, name: DW, name_ar: دويتشه فيله, url: "https://rss.dw.com/rdf/rss-en-all", lang: en, weight: 0.85, trusted: true }
+  - { id: dw_de, name: DW Deutsch, name_ar: دويتشه فيله, url: "https://rss.dw.com/rdf/rss-de-all", lang: de, weight: 0.85, trusted: true }
+  - { id: france24_en, name: France 24, name_ar: فرانس 24, url: "https://www.france24.com/en/rss", lang: en, weight: 0.85, trusted: true }
+  - { id: france24_fr, name: France 24 FR, name_ar: فرانس 24, url: "https://www.france24.com/fr/rss", lang: fr, weight: 0.85, trusted: true }
+  - { id: france24_ar, name: France 24 AR, name_ar: فرانس 24, url: "https://www.france24.com/ar/rss", lang: ar, weight: 0.85, trusted: true }
+  - { id: nyt_world, name: NYT World, name_ar: نيويورك تايمز, url: "https://rss.nytimes.com/services/xml/rss/nyt/World.xml", lang: en, weight: 0.9, trusted: true }
+  - { id: nyt_business, name: NYT Business, name_ar: نيويورك تايمز, url: "https://rss.nytimes.com/services/xml/rss/nyt/Business.xml", lang: en, weight: 0.9, trusted: true }
+  - { id: nyt_tech, name: NYT Technology, name_ar: نيويورك تايمز, url: "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml", lang: en, weight: 0.9, trusted: true }
+  - { id: guardian_world, name: The Guardian, name_ar: الغارديان, url: "https://www.theguardian.com/world/rss", lang: en, weight: 0.85, trusted: false }
+  - { id: npr_world, name: NPR, name_ar: إن بي آر, url: "https://feeds.npr.org/1004/rss.xml", lang: en, weight: 0.8, trusted: false }
+  - { id: cnbc, name: CNBC, name_ar: سي إن بي سي, url: "https://www.cnbc.com/id/100003114/device/rss/rss.html", lang: en, weight: 0.8, trusted: false }
+  - { id: techcrunch, name: TechCrunch, name_ar: تك كرانش, url: "https://techcrunch.com/feed/", lang: en, weight: 0.75, trusted: false }
+  - { id: verge, name: The Verge, name_ar: ذا فيرج, url: "https://www.theverge.com/rss/index.xml", lang: en, weight: 0.75, trusted: false }
+  - { id: ars, name: Ars Technica, name_ar: آرس تكنيكا, url: "https://feeds.arstechnica.com/arstechnica/index", lang: en, weight: 0.75, trusted: false }
+  - { id: lemonde, name: Le Monde, name_ar: لوموند, url: "https://www.lemonde.fr/rss/une.xml", lang: fr, weight: 0.85, trusted: false }
+  - { id: tagesschau, name: Tagesschau, name_ar: تاغسشاو, url: "https://www.tagesschau.de/index~rss2.xml", lang: de, weight: 0.8, trusted: false }
+  - { id: elpais, name: El País, name_ar: إل باييس, url: "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada", lang: es, weight: 0.8, trusted: false }
+  - { id: nhk, name: NHK, name_ar: إن إتش كي, url: "https://www3.nhk.or.jp/rss/news/cat0.xml", lang: ja, weight: 0.8, trusted: true }
+  # رويترز وأسوشيتد برس لا يوفّران RSS رسمياً؛ نستخدم بحث Google News (غير رسمي وقد يتغيّر)
+  - { id: reuters, name: Reuters, name_ar: رويترز, url: "https://news.google.com/rss/search?q=site:reuters.com+when:1d&hl=en-US&gl=US&ceid=US:en", lang: en, weight: 0.95, trusted: true, gnews: true }
+  - { id: ap, name: Associated Press, name_ar: أسوشيتد برس, url: "https://news.google.com/rss/search?q=site:apnews.com+when:1d&hl=en-US&gl=US&ceid=US:en", lang: en, weight: 0.95, trusted: true, gnews: true }
