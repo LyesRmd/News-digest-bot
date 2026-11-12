@@ -35,6 +35,7 @@ def classify_missing(stories: list, state: dict, cfg: dict, meta: dict, now: flo
             res = writer.classify(todo, meta, cfg)
             for sid, r in res.items():
                 state["classified"][sid] = {**r, "ts": now}
+            log.info("صُنّفت %d قصة من %d", len(res), len(todo))
         except LLMError as e:
             log.error("تعذّر التصنيف: %s", e)
     for s in stories:

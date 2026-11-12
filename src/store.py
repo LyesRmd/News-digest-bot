@@ -19,6 +19,8 @@ def default_state() -> dict:
         "last_collect": 0,
         "skip_next": False,
         "preview_request": False,
+        "force_batch": False,   # يُفعَّل بالأمر /now
+        "slot_tries": {},       # عدد محاولات كل دفعة
     }
 
 
@@ -47,3 +49,5 @@ def prune(state: dict, cfg: dict, now: float | None = None) -> None:
     state["published"] = [p for p in state["published"] if now - p["ts"] <= max(mem, 4 * 86400)]
     state["classified"] = {k: v for k, v in state["classified"].items() if now - v["ts"] <= 72 * 3600}
     state["done_slots"] = state["done_slots"][-60:]
+    tries = state.get("slot_tries", {})
+    state["slot_tries"] = dict(list(tries.items())[-60:])

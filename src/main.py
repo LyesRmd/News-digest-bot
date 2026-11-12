@@ -35,6 +35,10 @@ def tick(state: dict, pub, now: float, admin_id: str | None) -> None:
         notify(f"⚠️ فشل جمع الأخبار: {e}")
 
     try:
+        local = scheduler.local_dt(cfg, now)
+        log.info("الوقت المحلي (%s): %s", cfg["schedule"]["timezone"], local.strftime("%Y-%m-%d %H:%M"))
+        log.info("القصص في الذاكرة: %d خبراً خاماً", len(state["items"]))
+
         if state["preview_request"]:
             state["preview_request"] = False
             if admin_id:
@@ -42,17 +46,38 @@ def tick(state: dict, pub, now: float, admin_id: str | None) -> None:
 
         pipeline.run_breaking(state, cfg, pub, meta, now)
 
+        if state["force_batch"]:
+            state["force_batch"] = False
+            recs = pipeline.run_batch(state, cfg, pub, meta, now, remaining=1)
+            notify(f"⚡ دفعة فورية: نُشر {len(recs)} خبراً." + ("" if recs else " (لا قصص مؤهلة الآن، راجع السجل)"))
+
         slot = scheduler.due(cfg, state, now)
-        if slot:
-            state["done_slots"].append(slot.key)  # نسجّل أولاً لمنع التكرار عند الفشل الجزئي
+        if slot is None:
+            log.info("لا دفعة مستحقة الآن (المواعيد: %s + موجز %s، المهلة %d دقيقة)",
+                     " ".join(cfg["schedule"]["batch_times"]), cfg["schedule"]["digest_time"],
+                     cfg["schedule"]["grace_minutes"])
+        else:
+            tries = state["slot_tries"]
+            tries[slot.key] = tries.get(slot.key, 0) + 1
             if state["skip_next"]:
                 state["skip_next"] = False
+                state["done_slots"].append(slot.key)
                 notify(f"⏭ تم تخطي دفعة {slot.dt.strftime('%H:%M')}.")
             elif slot.kind == "digest":
+                state["done_slots"].append(slot.key)
                 pipeline.run_digest(state, cfg, pub, now)
             else:
-                rem = scheduler.remaining_batches(cfg, {**state, "done_slots": state["done_slots"][:-1]}, slot)
-                pipeline.run_batch(state, cfg, pub, meta, now, remaining=rem)
+                rem = scheduler.remaining_batches(cfg, state, slot)
+                recs = pipeline.run_batch(state, cfg, pub, meta, now, remaining=rem)
+                if recs:
+                    state["done_slots"].append(slot.key)
+                else:
+                    # لا نُغلق الدفعة: نعيد المحاولة في الدورات القادمة خلال المهلة
+                    log.info("لم يُنشر شيء في دفعة %s (المحاولة %d)، ستُعاد المحاولة خلال المهلة",
+                             slot.key, tries[slot.key])
+                    if tries[slot.key] == 1:
+                        notify(f"ℹ️ حان موعد دفعة {slot.dt.strftime('%H:%M')} لكن لا قصص مؤهلة بعد. "
+                               "سأعيد المحاولة خلال المهلة. راجع سجل GitHub Actions للتفاصيل.")
     except Exception as e:
         log.exception("فشل النشر")
         notify(f"⚠️ خطأ أثناء النشر: {e}")

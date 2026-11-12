@@ -19,6 +19,7 @@ HELP = """<b>أوامر التحكم</b>
 /other on|off — السماح بمجالات أخرى
 /source list | add &lt;url&gt; [الاسم] | remove &lt;id&gt;
 /preview — معاينة الدفعة القادمة دون نشر
+/now — نشر دفعة فوراً الآن (للاختبار)، دون انتظار الموعد
 /skip — تخطي الدفعة القادمة
 /reset — إلغاء كل التعديلات والعودة لملف settings.yaml"""
 
@@ -92,6 +93,7 @@ def status(state: dict, cfg: dict, now: float) -> str:
     paused = "⏸ متوقف" if cfg["channel"]["paused"] else "▶️ يعمل"
     return "\n".join([
         f"<b>الحالة:</b> {paused}",
+        f'الوقت المحلي حسب الإعدادات: {scheduler.local_dt(cfg, now).strftime("%Y-%m-%d %H:%M")}',
         f'القناة: {esc(str(cfg["channel"]["id"]))} | المنطقة الزمنية: {sc["timezone"]}',
         "دفعات اليوم: " + "  ".join(marks),
         f'أخبار في الذاكرة: {len(state["items"])} | منشور محفوظ: {len(state["published"])}',
@@ -212,6 +214,9 @@ def handle(text: str, state: dict, now: float) -> str:
                     ov.setdefault("sources_remove", []).append(key)
                 return f"✅ حُذف المصدر: {esc(args[1])}"
             return "الصيغة: /source list | add &lt;url&gt; [الاسم] | remove &lt;id&gt;"
+        if cmd == "/now":
+            state["force_batch"] = True
+            return "⚡ سأنشر دفعة فورية في الدورة التالية (أو فوراً إن شغّلت الـ workflow يدوياً)."
         if cmd == "/preview":
             state["preview_request"] = True
             return "👁 سأرسل معاينة الدفعة القادمة إليك في الدورة التالية (دقائق)."
